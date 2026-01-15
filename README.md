@@ -1,1 +1,1 @@
-# Data_Course_ButterfieldThis README file contains information about my uploaded assignments
+# Data_Course_ButterfieldThis README file contains my 10 practices
