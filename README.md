@@ -1,1 +1,1 @@
-# Data_Course_Butterfield Why can't dinosaurs clap their hands? Because they are extinct.
+# Data_Course_Butterfield What do you call a well-balanced horse? Stable
