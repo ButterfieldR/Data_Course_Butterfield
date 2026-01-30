@@ -1,0 +1,32 @@
+# 4. Write a command that lists all of the .csv files found in the Data/ 
+# directory and stores that list in an object called "cvs_files"
+list.files(path = "Data/", pattern= ".csv")
+csv_files = list.files(path = "Data/", pattern = ".csv")
+
+# 5. Find how many files match that description using the length() function.
+length (csv_files)
+
+# 6. Open the wingspan_vs_mass.csv file and store the contents as an R object 
+# named "df" using the read.csv() function.
+read.csv ('Data/wingspan_vs_mass.csv')
+df= read.csv ('Data/wingspan_vs_mass.csv')
+
+# 7. Inspect the first 5 lines of the data set using the head() function.
+head(df, n=5)
+
+# 8. Find any files (recursively) in the Data/ directory that begin with the 
+# letter "b" (lowercase)
+list.files(path = "Data/", pattern = '^b')
+
+# 9. Write a command that displays the first line if each of those "b" files 
+#(this is tricky... use a for-loop).
+b_files =list.files(path = "Data/", pattern = '^b')
+for(i in b_files){
+  print(readLines(i, n=1))
+}
+
+# 10. Do the same thing for all files that end in ".csv".
+df1 <- list.files("Data/", pattern = ".csv", full.names = TRUE)
+for(i in df1){
+  print(readLines(i,n=1))
+}
