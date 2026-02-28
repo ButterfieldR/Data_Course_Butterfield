@@ -1,0 +1,11 @@
+
+2. For my final project, I would like to do something on the topic of birds, specifically chickens.
+Ideally, I would like to do something that shows information for different traits of different breeds
+of chickens (such as time to maturity, size, egg laying frequency, egg color, etc.) to help those who
+want chickens to buy the breed that best fits what they need.
+3. The type of data I will use will include information such as different breeds of chickens, wing
+wing span, height, time to maturity/time to first egg, egg color, egg laying frequency, how long they
+lay eggs for, and their lifespan. One dataset that I have found that I am considering using (or using 
+something similar to) is Egg Producing Chickens on kaggle. The two main sources I am using to try and 
+find a dataset to use are kaggle and Google's data search. Ideally I would like to find data in a .csv
+file and have it set up in a table format.
