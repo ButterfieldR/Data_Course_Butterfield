@@ -1,0 +1,19 @@
+
+##Canvas Upload
+
+#Are any of your predicted response values for your best model scientifically meaningless? Explain
+  #No, I do not think any of the values are meaningless because all of the values are positive
+  #and the predicted values are reasonable.
+
+#In your plots, did you find any non-linear relationships?
+  #Yes, my 3rd model (mod3) had a non-linear relationship.
+  #Modeling non-linear relationships:
+    #https://www.econometrics-with-r.org/8.1-a-general-strategy-for-modelling-nonlinear-regression-functions.html
+    #https://www.datacamp.com/tutorial/introduction-to-non-linear-model-and-insights-using-r
+
+#Write the code you would use to model the data found in "/Data/non_linear_relationship.csv"
+#with a linear model
+nondat <- read.csv('../../Data/non_linear_relationship.csv')
+modnl1 = lm(response ~ predictor, data = nondat)
+
+
