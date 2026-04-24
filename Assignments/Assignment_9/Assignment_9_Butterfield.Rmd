@@ -1,0 +1,115 @@
+---
+title: "Assignment_9_Butterfield"
+author: "Rylie Butterfield"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Assignment 9
+
+## Set Up
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(easystats)
+library(kableExtra)
+library(GGally)
+library(modelr)
+```
+
+## Explore the Data
+```{r message=FALSE, warning=FALSE}
+grad <- read_csv("GradSchool_Admissions.csv")
+
+grad%>% kable() %>% kable_classic() %>% scroll_box(height = '250px')
+```
+  
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+summary(grad)
+```
+
+```{r}
+grad %>%
+  ggpairs()
+```
+
+This set of plots allows us to visualize what is happening with the data. It can be helpful in getting an idea of where to start when analyzing and modeling the data.  
+From the plots we can see that there is a possible connection between gpa and gre, so that might be somewhere to start when seeing what influences admission.
+
+Next, we can analyze some potential models:
+```{r message=FALSE, warning=FALSE}
+mod1= glm(admit ~ gpa, data = grad, family = 'binomial')
+summary(mod1)
+
+mod2 = glm(admit ~ gre, data= grad, family = 'binomial')
+summary(mod2)
+
+mod3 = glm(admit ~ rank, data = grad, family = 'binomial')
+summary(mod3)
+
+mod4 = glm(admit ~ gpa + rank + gre, data = grad, family = 'binomial')
+summary(mod4)
+
+mod5 = glm(admit ~ gpa:gre, data = grad, family = 'binomial')
+summary(mod5)
+
+mod6 = glm(admit ~ gpa:rank, data = grad, family = 'binomial')
+summary(mod6)
+
+mod7 = glm(admit ~ gpa + gre + gpa:gre, data = grad, family = 'binomial')
+summary(mod7)
+
+```
+
+To visualize the different models, we can compare them and plot them:
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+
+# compare all the models directly
+compare_performance(mod1, mod2, mod3, mod4, mod5, mod6, mod7, rank = TRUE)
+
+#visually compare the models
+compare_performance(mod1, mod2, mod3, mod4, mod5, mod6, mod7) %>% plot()
+```
+
+After comparing the models, we can see that mod4 and mod3 are the top two best models.
+
+Now we will plot the models to see if one is better than the other.
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+grad %>%
+  gather_predictions(mod4, mod3) %>%
+  ggplot(aes(x = admit, y =pred, color=model)) +
+  facet_wrap(~rank) +
+  geom_smooth()
+```
+
+Overall, it looks like mod4 is the best model, and we will use it to move forward with predictions.
+
+# Prediction
+We will make our predictions using mod4.
+
+First we can find the model parameters.
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+mod4 %>% model_parameters(exponentiate = TRUE)
+```
+
+Then we can create a column in the data frame with the predicted values and plot them to visualize the predictions.
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+grad2 = grad
+
+#make new column with predictions
+grad2$pred = predict(mod4, grad2, type = 'response')
+
+#plot the predictions
+grad2 %>%
+  ggplot(aes(x = admit, y = pred, color = rank)) +
+  geom_point()
+```
+
+Both of these should give us information to make conclusions
+
+# Conclusions
+1. A higher gpa makes you more likely to be admitted to grad school.
+2. A higher gre makes you more likely to be admitted to grad school.
+3. A higher rank does not make you more likely to be admitted to grad school.
