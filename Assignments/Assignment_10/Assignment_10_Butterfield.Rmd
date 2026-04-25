@@ -1,0 +1,111 @@
+---
+title: "Final Practice"
+author: "Rylie Butterfield"
+date: "2026-04-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Backyard Chickens
+
+## Background
+Backyard chickens are common for both their eggs and meat. One of the costs associated with raising backyard chickens the cost of their feed- if they eat more, it costs more. 
+The purpose of this project is compare two popular breeds of chickens to see if there is
+one that is better than the other depending on the amount of feed consumed and the amount of eggs produced.
+
+## Data
+The data used in this project was retrieved from Phuzo Soko on the [kaggle](https://www.kaggle.com/datasets/phuzoman/egg-producing-chickens?resource=download) website. The title of dataset was Egg Producing Chickens.
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+library(tidyverse)
+library(stringr)
+library(kableExtra)
+library(easystats)
+library(readr)
+library(broom)
+
+df1 <- read_csv("GallusGallusDomesticus.csv")
+
+df1 %>% kable() %>% kable_classic() %>% scroll_box(height = '250px')
+```
+
+## Amount of Feed vs Eggs per Day
+The purpose of this analysis is to see if there is a connection between the amount of feed
+a chicken consumes per day and the number of eggs they produce per day. This is important if you want to choose birds that provide more eggs for less feed.  
+To find the connection, correlation and statistical tests were used.
+
+```{r echo=TRUE}
+# Start by making a plot of the data to visualize any relationships
+
+df1 %>%
+  ggplot(aes(x=AmountOfFeed, y=EggsPerDay)) +
+  geom_point() +
+  geom_smooth(method = 'glm')
+
+```
+
+To see if there was any correlation of statistical significance, I created a model and used the Shapiro test and Kendall's Tau correlation to determine if there was any correlation between the amount of feed and the number of eggs produced.
+
+```{r, echo=TRUE}
+#model
+mod1 =  glm(data = df1, EggsPerDay ~ AmountOfFeed)
+
+#Shapiro test to determine if the data has a normal distribution
+shapiro.test(df1$EggsPerDay)
+shapiro.test(df1$AmountOfFeed)
+
+#Correlation
+cor.test(df1$AmountOfFeed, df1$EggsPerDay, method = 'kendall')
+
+```
+The Shapiro test showed that the data was not normally distributed. Due to this and tied ranks, Kendall's Tau correlation was chosen to determine if there was any correlation between the data.  
+The p-value is statistically significant  
+Kendall's correlation coefficient shows that there is a negative correlation, however, it is very small.
+Overall, these tests show that there is a relationship between the amount of feed consumed and the number of eggs per day. However, it is a very weak relationship.  
+
+Now knowing this information, we re-create the first plot with the color indicating the breed of the chicken 
+
+```{r, echo= FALSE}
+df1 %>%
+  ggplot(aes(x=AmountOfFeed, y=EggsPerDay, color = GallusBreed)) +
+  geom_point() +
+  geom_smooth(method = 'glm')
+```
+From the plot we can see that the weak negative correlation is more associated with the Maran breed.
+
+## Amount of Feed vs Weight
+While the weight of a chicken does not equal how much meat is on a chicken, a chicken with a greater weight will have more meat. The purpose of this analysis is to see if there is a connection between the amount of feed a chicken consumes and its weight (and therefore the amount of meat).
+
+```{r}
+df1 %>%
+  ggplot(aes(x=AmountOfFeed, y=GallusWeight, color = GallusBreed)) +
+  geom_point() +
+  geom_smooth(method = 'glm')
+```
+From the plot we can see that there isn't a distinct relationship to the amount of feed consumed and the weight of the chicken. The only noticeable pattern is that Ameracauna birds generally consume less feed and and weigh less compared to Maranas.  
+
+To see if there was any correlation or statistical significance that could not be pick up on by the plot alone, correlation and statistical tests were performed.
+```{r echo=TRUE}
+mod7 <- glm(data = df1, GallusWeight ~ AmountOfFeed)
+
+#Shapiro test
+shapiro.test(df1$GallusWeight)
+shapiro.test(df1$AmountOfFeed)
+
+#correlation test
+cor.test(df1$AmountOfFeed, df1$GallusWeight, method = 'kendall')
+```
+From the Shapiro test we learn that the distribution of the data is not normal. Therefore, Kendall's Tau was used for the correlation as well as to remain consistent with the previous section.  
+The p-value was found to be statistically significant.  
+The z score was found to be more than four standard deviations from the mean. This means that many of the points are far away from the average.  
+Kendall's correlation coefficient was positive and very small (close to zero) indicating that there is a very weak relationship.  
+Overall, there is a very weak positive relationship between the amount of feed consumed and the weight of the bird.
+
+## Discussion
+While this dataset was a good starting point, more data points from more than two species of chicken would be useful in determining if there is significance in the amount of feed consumed compared to the number of eggs laid and the weight of the bird. Future analysis could be done to compare individual birds of a specific breed to find relationships within species (such as how age might affect the amount of eggs laid or feed consumed).  
+
+## Conclusion
+From these analyses that were conducted on the dataset with the intent of determining a correlation between feed consumed and eggs laid and the weight of the bird, no specific conclusions can be drawn to recommend Marans over Ameraucanas. 
