@@ -1,0 +1,129 @@
+---
+title: "Exam 3"
+author: "Rylie Butterfield"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Professor Salaries
+
+First we want to load the libraries needed.
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(easystats)
+library(broom)
+```
+
+Next, we want to load the data.
+```{r message=FALSE, warning=FALSE}
+sal = read.csv('FacultySalaries_1995.csv')
+```
+
+Then we want to clean the data.
+```{r message=FALSE, warning=FALSE}
+
+#pivot_longer() makes the data longer and puts all the ranks and salaries into their own columns.
+#change the original column names 
+sal2 = sal %>%
+  pivot_longer(cols = c('AvgFullProfSalary', 'AvgAssocProfSalary', 'AvgAssistProfSalary'),
+               names_to = 'Rank',
+               values_to = 'Salary') %>%
+  mutate(Rank = case_when(Rank == 'AvgFullProfSalary'~'Full',
+                          Rank == 'AvgAssocProfSalary'~'Assoc',
+                          Rank == 'AvgAssistProfSalary'~'Assist'))
+```
+
+Finally, we want to plot the data comparing Rank and Salary.
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+sal2 %>%
+  filter(Tier != 'VIIB') %>%
+ggplot(aes(x = Rank, y = Salary, fill = Rank)) +
+  geom_boxplot() +
+  facet_wrap(~Tier) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+## Build and ANOVA Model
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+#build the model
+mod1 = aov(Salary ~ State + Tier + Rank, data = sal2)
+
+#show the summary of the model
+summary(mod1)
+```
+
+
+# Jupiter Oils
+First we want to load the data.
+```{r message=FALSE, warning=FALSE}
+oil = read.csv('Juniper_Oils.csv')
+```
+
+Next, we want to clean the data.
+```{r message=FALSE, warning=FALSE}
+#Make the data longer and change the names in the ChemicalID column
+oil2 = oil %>%
+  pivot_longer(cols = 11:33,
+               names_to = "ChemicalID",
+               values_to = 'Concentration') %>%
+  mutate(ChemicalID = case_when(ChemicalID =='alpha.pinene' ~ 'alpha-pinene',
+                                ChemicalID =='para.cymene' ~ 'para-cymene',
+                                ChemicalID =='alpha.terpineol' ~ 'alpha-terpineol',
+                                ChemicalID =='cedr.9.ene' ~ 'cedr-9-ene',
+                                ChemicalID =='alpha.cedrene' ~ 'alpha-cedrene',
+                                ChemicalID =='beta.cedrene' ~ 'alpha-cedrene',
+                                ChemicalID =='beta.cedrene' ~ 'beta-cedrene',
+                                ChemicalID =='cis.thujopsene' ~ 'cis-thujopsene',
+                                ChemicalID =='alpha.himachalene' ~ 'alpha-himachalene',
+                                ChemicalID =='beta.chamigrene' ~ 'beta-chamigrene',
+                                ChemicalID =='compound.1' ~ 'compound 1',
+                                ChemicalID =='alpha.chamigrene' ~ 'alpha-chamigrene',
+                                ChemicalID =='beta.acorenol' ~ 'beta-acorenol',
+                                ChemicalID =='alpha.acorenol' ~ 'alpha-acorenol',
+                                ChemicalID =='gamma.eudesmol' ~ 'gamma-audesmol',
+                                ChemicalID =='beta.eudesmol' ~ 'beta-eudesmol',
+                                ChemicalID =='alpha.eudesmol' ~ 'alpha-eudesmol',
+                                ChemicalID =='cedr.8.en.13.ol' ~ 'cedr-8-en-13-ol',
+                                ChemicalID =='cedr.8.en.15.ol' ~ 'cedr-8-en-15-ol',
+                                ChemicalID =='compound.2' ~ 'compound 2',
+                                ChemicalID =='cuparene' ~ 'cuparene',
+                                ChemicalID =='widdrol' ~ 'widdrol',
+                                ChemicalID =='cedrol' ~ 'cedrol',
+                                ChemicalID =='thujopsenal' ~ 'thujopsenal',))
+```
+
+Then, we want to create plots for the concentration of each chemical in the years since the burn.
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+
+oil2 %>%
+  ggplot(aes(x = YearsSinceBurn, y = Concentration)) +
+  geom_smooth() +
+  facet_wrap(~ChemicalID, scales = 'free_y') +
+  theme_minimal()
+```
+
+## Create a model to show which concentrations are significant
+
+First, we need to create a model.
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+#create the model
+mod2 = glm(Concentration ~ YearsSinceBurn + ChemicalID, data = oil2)
+
+#see information from the model
+summary(mod2)
+```
+
+Next, we will limit the results to what concentrations are significant
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+#choose what we want reported
+sig_conc <- tidy(mod2) %>%
+  filter(p.value < 0.05)
+
+#show the results of what concentrations are significant
+print(sig_conc)
+```
+
